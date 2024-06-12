@@ -1,25 +1,19 @@
 import { useEffect, useState, useCallback } from 'react';
 
-const VK_LEFT = 37;
-const VK_RIGHT = 39;
-const VK_UP = 38;
-const VK_DOWN = 40;
-const VK_ENTER = 13;
-
 export const useTVControls = (
   rowCount: number,
   colCounts: number[],
   hasFeaturedSection: boolean = false
 ) => {
-  const [selectedRow, setSelectedRow] = useState(1); // 0 for featured section
+  const [selectedRow, setSelectedRow] = useState(0); // Start with the first row
   const [selectedIndexes, setSelectedIndexes] = useState(() =>
     colCounts.map(() => 0)
   );
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
-      switch (e.keyCode) {
-        case VK_RIGHT:
+      switch (e.key) {
+        case 'ArrowRight':
           setSelectedIndexes((prevIndexes) => {
             const newIndexes = [...prevIndexes];
             newIndexes[selectedRow] =
@@ -27,7 +21,7 @@ export const useTVControls = (
             return newIndexes;
           });
           break;
-        case VK_LEFT:
+        case 'ArrowLeft':
           setSelectedIndexes((prevIndexes) => {
             const newIndexes = [...prevIndexes];
             newIndexes[selectedRow] =
@@ -36,29 +30,14 @@ export const useTVControls = (
             return newIndexes;
           });
           break;
-        case VK_DOWN:
-          setSelectedRow((prevRow) => {
-            const newRow = Math.min(prevRow + 1, rowCount - 1);
-            setSelectedIndexes((prevIndexes) => {
-              const newIndexes = [...prevIndexes];
-              newIndexes[newRow] = 0; // Reset index for new row
-              return newIndexes;
-            });
-            return newRow;
-          });
+        case 'ArrowDown':
+          setSelectedRow((prevRow) => Math.min(prevRow + 1, rowCount - 1));
           break;
-        case VK_UP:
-          setSelectedRow((prevRow) => {
-            const newRow = Math.max(prevRow - 1, 0);
-            setSelectedIndexes((prevIndexes) => {
-              const newIndexes = [...prevIndexes];
-              newIndexes[newRow] = 0; // Reset index for new row
-              return newIndexes;
-            });
-            return newRow;
-          });
+        case 'ArrowUp':
+          setSelectedRow((prevRow) => Math.max(prevRow - 1, 0));
           break;
-        case VK_ENTER:
+        case 'Enter':
+          // Handle enter key, e.g., trigger a click event on the focused element
           alert(
             `Selected item at row: ${selectedRow}, index: ${selectedIndexes[selectedRow]}`
           );
@@ -67,7 +46,7 @@ export const useTVControls = (
           break;
       }
     },
-    [colCounts, selectedRow, rowCount, selectedIndexes]
+    [colCounts, selectedRow, rowCount]
   );
 
   useEffect(() => {
